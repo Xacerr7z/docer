@@ -1,0 +1,28 @@
+version: '3.8'
+
+secrets:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: guicorn config.wsgi:application --build 104.248.231.120:8000
+    volumes:
+      - .:/app #монтируем проект в контейнер
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_SETTINGS_MODEL=config.settings
+
+  bot:
+    build:
+      context: .
+      dockerfile: bot/Dockerfile
+    volumes:
+      - .:/app # монтируем проект в контрейнер
+    environment:
+     - BOT_API_TOKEN=${BOT_API_TOKEN}
+     - DJANGO_SETTINGS_MODEL=config.settings
+    depends_on:
+      - web
